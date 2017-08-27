@@ -54,8 +54,8 @@ class TFServer:
         print("{:s}: {}".format(key.name, val))
         self.session.run(key.assign(val))
 
-    self.modifiable_parameters = params
-    self.__save_params()
+      self.modifiable_parameters = params
+      self.__save_params()
 
   @staticmethod
   def __map_params_to_names(params):
@@ -112,7 +112,11 @@ class TFServer:
 
   def __load_params(self):
 
-    with open(self.file, "r") as file:
-      obj = json.load(file)
+    try:
+      with open(self.file, "r") as file:
+        obj = json.load(file)
+    except FileNotFoundError:
+      print("Session file not accessible, skipping update.")
+      return self.modifiable_parameters
 
     return obj[self.MODIFIABLE_PARAMETERS]
