@@ -1,5 +1,5 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import multiprocessing, urllib, json
+import multiprocessing, urllib, json, threading
 
 class SessionServer(HTTPServer):
 
@@ -41,7 +41,6 @@ class SessionServer(HTTPServer):
       }
 
       json_string = json.dumps(json_obj).encode()
-      print(json_string)
 
       self.send_response(200)
       self.end_headers()
@@ -117,6 +116,13 @@ class SessionServer(HTTPServer):
         "iteration": iteration, "tensor_name": tensor_name, "value": value
       })
 
-httpd = SessionServer([], None)
-print("Running server.")
-httpd.serve_forever()
+def run_server(tensors, session, address="127.0.0.1", port=8000):
+  httpd = SessionServer(tensors, session, address=address, port=port)
+
+  def worker(server):
+    server.serve_forever()
+
+  thread = threading.Thread(target=worker, args=(httpd,), daemon=True)
+  thread.start()
+
+  return httpd, thread
