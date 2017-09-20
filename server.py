@@ -116,6 +116,9 @@ class SessionServer(HTTPServer):
         "iteration": iteration, "tensor_name": tensor_name, "value": value
       })
 
+    def log_message(self, format, *args):
+      return
+
 def run_server(tensors, session, address="127.0.0.1", port=8000):
   httpd = SessionServer(tensors, session, address=address, port=port)
 
