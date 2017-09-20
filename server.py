@@ -1,5 +1,5 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import multiprocessing, urllib
+import multiprocessing, urllib, json
 
 class SessionServer(HTTPServer):
 
@@ -17,9 +17,35 @@ class SessionServer(HTTPServer):
     self.shared["events"] = manager.list()
     self.shared["past_events"] = manager.list()
 
-    print("init")
+  def check_events(self, iteration):
+
+    for idx, event in enumerate(reversed(self.shared["events"])):
+
+      if event.iteration <= iteration:
+        self.assign_value(event.tensor_name, event.value)
+        del self.shared["events"][idx]
+
+  def assign_value(self, tensor_name, value):
+
+    tensor_index = self.shared["tensor_names"].index(tensor_name)
+    tensor = self.shared["tensors"][tensor_index]
+    self.shared["session"].run(tensor.assign(value))
 
   class RequestHandler(BaseHTTPRequestHandler):
+
+    def do_GET(self):
+
+      json_obj = {
+        "events": self.server.shared["events"]._getvalue(),
+        "past_events": self.server.shared["past_events"]._getvalue()
+      }
+
+      json_string = json.dumps(json_obj).encode()
+      print(json_string)
+
+      self.send_response(200)
+      self.end_headers()
+      self.wfile.write(json_string)
 
     def do_POST(self):
       length = int(self.headers['Content-Length'])
@@ -87,30 +113,9 @@ class SessionServer(HTTPServer):
       self.end_headers()
 
     def add_event(self, iteration, tensor_name, value):
-      self.server.shared["events"].append(Event(iteration, tensor_name, value))
-
-  def check_events(self, iteration):
-
-    for idx, event in enumerate(reversed(self.shared["events"])):
-
-      if event.iteration <= iteration:
-        self.assign_value(event.tensor_name, event.value)
-        del self.shared["events"][idx]
-
-  def assign_value(self, tensor_name, value):
-
-    tensor_index = self.shared["tensor_names"].index(tensor_name)
-    tensor = self.shared["tensors"][tensor_index]
-    self.shared["session"].run(tensor.assign(value))
-
-class Event:
-
-  def __init__(self, iteration, tensor_name, value):
-
-    self.iteration = iteration
-    self.tensor_name = tensor_name
-    self.value = value
-
+      self.server.shared["events"].append({
+        "iteration": iteration, "tensor_name": tensor_name, "value": value
+      })
 
 httpd = SessionServer([], None)
 print("Running server.")
