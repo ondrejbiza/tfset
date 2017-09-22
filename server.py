@@ -3,7 +3,7 @@ import multiprocessing, urllib, json, threading
 
 class SessionServer(HTTPServer):
 
-  def __init__(self, tensors, session, address="127.0.0.1", port=8000):
+  def __init__(self, tensors, session, address="127.0.0.1", port=8084):
 
     super(HTTPServer, self).__init__((address, port), self.RequestHandler)
 
@@ -73,14 +73,18 @@ class SessionServer(HTTPServer):
         if "value_type" in post_data:
           value_type = post_data["value_type"][0]
 
-          if value_type == "int":
-            value = int(value)
-          elif value_type == "float":
-            value = float(value)
-          elif value_type == "string":
-            pass
-          else:
+          try:
+            if value_type == "int":
+              value = int(value)
+            elif value_type == "float":
+              value = float(value)
+            elif value_type == "string":
+              pass
+            else:
+              error = True
+          except ValueError:
             error = True
+
       else:
         error = True
 
@@ -124,7 +128,7 @@ class SessionServer(HTTPServer):
     def log_message(self, format, *args):
       return
 
-def run_server(tensors, session, address="127.0.0.1", port=8000):
+def run_server(tensors, session, address="127.0.0.1", port=8084):
   httpd = SessionServer(tensors, session, address=address, port=port)
 
   def worker(server):

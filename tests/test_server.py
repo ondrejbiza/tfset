@@ -3,7 +3,7 @@ import tensorflow as tf
 
 class TestServer(unittest.TestCase):
 
-  address = "http://127.0.0.1:8000"
+  address = "http://127.0.0.1:8084"
 
   def setUp(self):
     self.tensor = tf.get_variable("tensor", initializer=tf.constant(0.1, dtype=tf.float32))
