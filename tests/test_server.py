@@ -1,15 +1,22 @@
 import unittest, server, requests, json
+import tensorflow as tf
 
 class TestServer(unittest.TestCase):
 
   address = "http://127.0.0.1:8000"
 
   def setUp(self):
-    self.httpd, self.thread = server.run_server([], None)
+    tensor = tf.get_variable("tensor", initializer=tf.constant(0.1, dtype=tf.float32))
+    self.session = tf.Session()
+    self.session.run(tf.global_variables_initializer())
+
+    self.httpd, self.thread = server.run_server([tensor], self.session)
 
   def tearDown(self):
     self.httpd.shutdown()
     self.thread.join(timeout=10)
+    self.session.close()
+    tf.reset_default_graph()
 
   def test_start_and_stop_server(self):
     pass
@@ -27,7 +34,7 @@ class TestServer(unittest.TestCase):
 
     event = {
       "iteration": 10,
-      "tensor_name": "learning_rate",
+      "tensor_name": "tensor:0",
       "value": 0.001
     }
 
@@ -49,12 +56,12 @@ class TestServer(unittest.TestCase):
 
     event_1 = {
       "iteration": 10,
-      "tensor_name": "learning_rate",
+      "tensor_name": "tensor:0",
       "value": 0.001
     }
     event_2 = {
       "iteration": 100,
-      "tensor_name": "save_freq",
+      "tensor_name": "tensor:0",
       "value": 10
     }
 
@@ -78,10 +85,10 @@ class TestServer(unittest.TestCase):
     self.assertTrue(len(content["past_events"]) == 0)
 
   def test_remove_event(self):
-    
+
     event = {
       "iteration": 10,
-      "tensor_name": "learning_rate",
+      "tensor_name": "tensor:0",
       "value": 0.001
     }
 
@@ -102,6 +109,22 @@ class TestServer(unittest.TestCase):
     self.assertEqual(get_r.status_code, 200)
     self.assertTrue(len(content["events"]) == 0)
     self.assertTrue(len(content["past_events"]) == 0)
+
+  def test_trigger_event(self):
+    event = {
+      "iteration": 10,
+      "tensor_name": "tensor:0",
+      "value": 0.001
+    }
+
+    data = event.copy()
+    data["value_type"] = "float"
+
+    post_r = requests.post(self.address, data=data)
+    self.assertEqual(post_r.status_code, 200)
+
+    self.httpd.check_events(5)
+    #TODO: finish check_events(10) ...
 
   @staticmethod
   def __decode_json(content):

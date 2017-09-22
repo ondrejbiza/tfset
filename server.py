@@ -7,13 +7,13 @@ class SessionServer(HTTPServer):
 
     super(HTTPServer, self).__init__((address, port), self.RequestHandler)
 
+    self.tensors = tensors
+    self.session = session
+
     manager = multiprocessing.Manager()
     self.shared = manager.dict()
 
-    self.shared["tensors"] = tensors
-    self.shared["session"] = session
     self.shared["tensor_names"] = [tensor.name for tensor in tensors]
-
     self.shared["events"] = manager.list()
     self.shared["past_events"] = manager.list()
 
@@ -28,8 +28,8 @@ class SessionServer(HTTPServer):
   def assign_value(self, tensor_name, value):
 
     tensor_index = self.shared["tensor_names"].index(tensor_name)
-    tensor = self.shared["tensors"][tensor_index]
-    self.shared["session"].run(tensor.assign(value))
+    tensor = self.tensors[tensor_index]
+    self.session.run(tensor.assign(value))
 
   class RequestHandler(BaseHTTPRequestHandler):
 
@@ -63,6 +63,10 @@ class SessionServer(HTTPServer):
           error = True
 
         tensor_name = post_data["tensor_name"][0]
+
+        if tensor_name not in self.server.shared["tensor_names"]:
+          error = True
+
         value = post_data["value"][0]
 
         if "value_type" in post_data:
