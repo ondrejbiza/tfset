@@ -6,11 +6,11 @@ class TestServer(unittest.TestCase):
   address = "http://127.0.0.1:8000"
 
   def setUp(self):
-    tensor = tf.get_variable("tensor", initializer=tf.constant(0.1, dtype=tf.float32))
+    self.tensor = tf.get_variable("tensor", initializer=tf.constant(0.1, dtype=tf.float32))
     self.session = tf.Session()
     self.session.run(tf.global_variables_initializer())
 
-    self.httpd, self.thread = server.run_server([tensor], self.session)
+    self.httpd, self.thread = server.run_server([self.tensor], self.session)
 
   def tearDown(self):
     self.httpd.shutdown()
@@ -124,7 +124,13 @@ class TestServer(unittest.TestCase):
     self.assertEqual(post_r.status_code, 200)
 
     self.httpd.check_events(5)
-    #TODO: finish check_events(10) ...
+    self.assertTrue(len(self.httpd.shared["events"]) == 1)
+    self.assertTrue(len(self.httpd.shared["past_events"]) == 0)
+
+    self.httpd.check_events(15)
+    self.assertTrue(len(self.httpd.shared["events"]) == 0)
+    self.assertTrue(len(self.httpd.shared["past_events"]) == 1)
+    self.assertAlmostEqual(self.session.run(self.tensor), event["value"], places=3)
 
   @staticmethod
   def __decode_json(content):

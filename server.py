@@ -21,8 +21,9 @@ class SessionServer(HTTPServer):
 
     for idx, event in enumerate(reversed(self.shared["events"])):
 
-      if event.iteration <= iteration:
-        self.assign_value(event.tensor_name, event.value)
+      if event["iteration"] <= iteration:
+        self.assign_value(event["tensor_name"], event["value"])
+        self.shared["past_events"].append(self.shared["events"][idx])
         del self.shared["events"][idx]
 
   def assign_value(self, tensor_name, value):
