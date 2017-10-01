@@ -13,62 +13,114 @@ def print_events(events):
 
 def main(args):
 
-  while True:
-    address = "{:s}:{:d}".format(args.address, args.port)
+  address = "{}:{}".format(args.address, args.port)
+
+  if args.status:
 
     r = requests.get(address)
     content = decode_json(r.content)
 
+    if r.status_code != 200:
+      print("Status request error.")
+      exit(1)
+
+    if "events" not in content and "past_events" not in content and "tensor_names" not in content and \
+       "last_check_iteration" not in content:
+      print("Response format error.")
+      exit(1)
+
+    print("Status:")
     print()
-    print("Scheduled events:")
+
+    print("Events:")
     print_events(content["events"])
+    print()
+
     print("Past events:")
     print_events(content["past_events"])
-
     print()
-    print("Actions: 1. schedule event, 2. remove event.")
 
-    while True:
-      try:
-        action_id = int(input())
-        break
-      except ValueError:
-        print("1 or 2")
+    print("Tensor names:")
+    if len(content["tensor_names"]) > 0:
+      for tensor_name in content["tensor_names"]:
+        print(tensor_name)
+    else:
+      print("None")
+    print()
 
-    if action_id == 1:
+    print("Last iteration checked: {:d}".format(content["last_check_iteration"]))
 
-      while True:
-        try:
-          iteration = int(input("iteration: "))
-          break
-        except ValueError:
-          print("Integer, please.")
+  elif args.add:
 
-      tensor_name = input("tensor name: ")
-      value = input("value: ")
+    if None in [args.tname, args.iter, args.value, args.vtype]:
 
-      while True:
-        value_type = input("value type: ")
+      print("Please specify tensor name (--tname), iteration (--iter), value (--value) and value typep (--vtype).")
+      exit(1)
 
-        if value_type not in ["int", "float", "string"]:
-          print("Integer, float or string, please.")
-        else:
-          break
+    data = {
+      "tensor_name": args.tname,
+      "iteration": args.iter,
+      "value": args.value,
+      "value_type": args.vtype
+    }
 
-      event = {
-        "iteration": iteration,
-        "tensor_name": tensor_name,
-        "value": value,
-        "value_type": value_type
-      }
-      requests.post(address, data=event)
+    post_r = requests.post(address, data=data)
+
+    if post_r.status_code == 200:
+      print("Event successfully added.")
+    else:
+      print("Error while adding the event.")
+      exit(1)
+
+  elif args.remove:
+
+    if None in [args.eidx]:
+
+      print("Please specify event index (--eidx).")
+      exit(1)
+
+    data = {
+      "event_idx": args.eidx
+    }
+
+    post_r = requests.post(address, data=data)
+
+    if post_r.status_code == 200:
+      print("Event successfully removed.")
+    else:
+      print("Error while removing the event.")
+      exit(1)
+
+  else:
+
+    print("No action specified.")
+    exit(1)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-a", "--address", default="http://127.0.0.1")
-parser.add_argument("-p", "--port", type=int, default=8084)
+
+# action parameters
+parser.add_argument("-s", "--status", default=False, action="store_true", help="print status (tensor names, registered events, ...)")
+parser.add_argument("-a", "--add", default=False, action="store_true", help="add event")
+parser.add_argument("-r", "--remove", default=False, action="store_true", help="remove event")
+
+# add parameters
+parser.add_argument("--tname", help="tensor name")
+parser.add_argument("--iter", type=int, help="iteration")
+parser.add_argument("--value", help="value")
+parser.add_argument("--vtype", help="value type")
+
+# remove parameters
+parser.add_argument("--eidx", type=int, help="event index")
+
+# connection parameters
+parser.add_argument("--address", default="http://127.0.0.1")
+parser.add_argument("--port", type=int, default=8084)
+
 parsed = parser.parse_args()
 
+# catch all request connection errors
 try:
   main(parsed)
 except requests.exceptions.ConnectionError:
   print("Connection error.")
+  exit(1)
