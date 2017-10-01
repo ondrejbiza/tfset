@@ -14,11 +14,16 @@ class SessionServer(HTTPServer):
     self.shared = manager.dict()
 
     self.shared["tensor_names"] = [tensor.name for tensor in tensors]
+    self.shared["last_check_iteration"] = 0
     self.shared["events"] = manager.list()
     self.shared["past_events"] = manager.list()
 
   def check_events(self, iteration):
 
+    # remember when we last checked
+    self.shared["last_check_iteration"] = iteration
+
+    # check if any event is triggered
     for idx, event in enumerate(reversed(self.shared["events"])):
 
       if event["iteration"] <= iteration:
@@ -38,7 +43,9 @@ class SessionServer(HTTPServer):
 
       json_obj = {
         "events": self.server.shared["events"]._getvalue(),
-        "past_events": self.server.shared["past_events"]._getvalue()
+        "past_events": self.server.shared["past_events"]._getvalue(),
+        "tensor_names": self.server.shared["tensor_names"],
+        "last_check_iteration": self.server.shared["last_check_iteration"]
       }
 
       json_string = json.dumps(json_obj).encode()
