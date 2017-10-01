@@ -5,7 +5,7 @@ import server
 
 # create tensors for parameters
 learning_rate = tf.get_variable("learning_rate", initializer=tf.constant(0.1, dtype=tf.float32))
-dropout_prop = tf.get_variable("dropout_prop", initializer=tf.constant(0.9, dtype=tf.float32))
+dropout_prob = tf.get_variable("dropout_prob", initializer=tf.constant(0.9, dtype=tf.float32))
 is_training = tf.placeholder(tf.bool, [])
 
 num_iterations = 100000
@@ -30,7 +30,7 @@ pool2 = tf.layers.max_pooling2d(conv2, pool_size=(2, 2), strides=(2, 2))
 conv3 = tf.layers.conv2d(pool2, filters=128, kernel_size=(3, 3), strides=(1, 1), activation=tf.nn.relu)
 pool4 = tf.reduce_mean(conv3, reduction_indices=(1, 2))
 
-dropout = tf.layers.dropout(pool4, rate=dropout_prop, training=is_training)
+dropout = tf.layers.dropout(pool4, rate=dropout_prob, training=is_training)
 
 logits = tf.layers.dense(dropout, 10)
 
@@ -55,7 +55,7 @@ with tf.Session() as sess:
   sess.run(init_op)
 
   # start the server
-  s, thread = server.run_server([learning_rate, dropout_prop], sess)
+  s, thread = server.run_server([learning_rate, dropout_prob], sess)
 
   # training
   for step in range(num_iterations):

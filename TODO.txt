@@ -1,3 +1,0 @@
-* server get return list of tensor names
-* server get return last checked iteration
-* add tests for failure cases

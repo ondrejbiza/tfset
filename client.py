@@ -1,4 +1,4 @@
-import argparse, json, requests, sys
+import argparse, json, requests
 
 def decode_json(content):
   return json.loads(content.decode())
