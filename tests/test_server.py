@@ -12,6 +12,7 @@ class TestServer(unittest.TestCase):
       tf.get_variable("tensor3", initializer=tf.constant("potato", dtype=tf.string))
     ]
     self.tensor_names = [tensor.name for tensor in self.tensors]
+    self.invalid_tensor_name = "t1"
     self.session = tf.Session()
     self.session.run(tf.global_variables_initializer())
 
@@ -140,6 +141,25 @@ class TestServer(unittest.TestCase):
     self.assertEqual(len(self.httpd.shared["past_events"]), 1)
     self.assertAlmostEqual(self.session.run(self.tensors[0]), event["value"], places=3)
     self.assertEqual(self.httpd.shared["last_check_iteration"], 15)
+
+  def test_empty_post(self):
+
+    post_r = requests.post(self.address)
+    self.assertEqual(post_r.status_code, 400)
+
+  def test_post_invalid_tensor_name(self):
+
+    event = {
+      "iteration": 10,
+      "tensor_name": self.invalid_tensor_name,
+      "value": 0.001
+    }
+
+    data = event.copy()
+    data["value_type"] = "float"
+
+    post_r = requests.post(self.address, data=data)
+    self.assertEqual(post_r.status_code, 400)
 
   @staticmethod
   def __decode_json(content):
