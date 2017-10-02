@@ -46,7 +46,7 @@ class SessionServer(HTTPServer):
         "events": [x for x in self.server.shared["events"]],
         "past_events": [x for x in self.server.shared["past_events"]],
         "tensor_names": self.server.shared["tensor_names"],
-        "last_check_iteration": self.server.shared["last_check_iteration"]
+        "last_check_iteration": int(self.server.shared["last_check_iteration"])
       }
 
       json_string = json.dumps(json_obj).encode()
