@@ -132,13 +132,13 @@ class TestServer(unittest.TestCase):
     self.assertEqual(post_r.status_code, 200)
 
     self.httpd.check_events(5)
-    self.assertEqual(len(self.httpd.shared["events"]), 1)
-    self.assertEqual(len(self.httpd.shared["past_events"]), 0)
+    self.assertEqual(len(self.httpd.events), 1)
+    self.assertEqual(len(self.httpd.past_events), 0)
     self.assertEqual(self.httpd.shared["last_check_iteration"], 5)
 
     self.httpd.check_events(15)
-    self.assertEqual(len(self.httpd.shared["events"]), 0)
-    self.assertEqual(len(self.httpd.shared["past_events"]), 1)
+    self.assertEqual(len(self.httpd.events), 0)
+    self.assertEqual(len(self.httpd.past_events), 1)
     self.assertAlmostEqual(self.session.run(self.tensors[0]), event["value"], places=3)
     self.assertEqual(self.httpd.shared["last_check_iteration"], 15)
 

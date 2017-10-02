@@ -15,8 +15,9 @@ class SessionServer(HTTPServer):
 
     self.shared["tensor_names"] = [tensor.name for tensor in tensors]
     self.shared["last_check_iteration"] = 0
-    self.shared["events"] = manager.list()
-    self.shared["past_events"] = manager.list()
+
+    self.events = manager.list()
+    self.past_events = manager.list()
 
   def check_events(self, iteration):
 
@@ -24,12 +25,12 @@ class SessionServer(HTTPServer):
     self.shared["last_check_iteration"] = iteration
 
     # check if any event is triggered
-    for idx, event in enumerate(reversed(self.shared["events"])):
+    for idx, event in enumerate(reversed(self.events)):
 
       if event["iteration"] <= iteration:
         self.assign_value(event["tensor_name"], event["value"])
-        self.shared["past_events"].append(self.shared["events"][idx])
-        del self.shared["events"][idx]
+        self.past_events.append(self.events[idx])
+        del self.events[idx]
 
   def assign_value(self, tensor_name, value):
 
@@ -43,8 +44,8 @@ class SessionServer(HTTPServer):
 
       # events and past_events are a ListProxy that isn't JSON serializable => convert it to Python list
       json_obj = {
-        "events": [x for x in self.server.shared["events"]],
-        "past_events": [x for x in self.server.shared["past_events"]],
+        "events": [x for x in self.server.events],
+        "past_events": [x for x in self.server.past_events],
         "tensor_names": self.server.shared["tensor_names"],
         "last_check_iteration": int(self.server.shared["last_check_iteration"])
       }
@@ -115,13 +116,13 @@ class SessionServer(HTTPServer):
       if "event_idx" in post_data:
         event_idx = int(post_data["event_idx"][0])
 
-        if event_idx >= len(self.server.shared["events"]):
+        if event_idx >= len(self.server.events):
           error = True
       else:
         error = True
 
       if not error:
-        del self.server.shared["events"][event_idx]
+        del self.server.events[event_idx]
         self.send_response_only(200)
       else:
         self.send_error(400, "Invalid delete event request.")
@@ -129,7 +130,7 @@ class SessionServer(HTTPServer):
       self.end_headers()
 
     def add_event(self, iteration, tensor_name, value):
-      self.server.shared["events"].append({
+      self.server.events.append({
         "iteration": iteration, "tensor_name": tensor_name, "value": value
       })
 
