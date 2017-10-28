@@ -46,10 +46,7 @@ class TestServer(unittest.TestCase):
       "value": 0.001
     }
 
-    data = event.copy()
-    data["value_type"] = "float"
-
-    post_r = requests.post(self.address, data=data)
+    post_r = requests.post(self.address, data=event)
     self.assertEqual(post_r.status_code, 200)
 
     get_r = requests.get(self.address)
@@ -73,14 +70,9 @@ class TestServer(unittest.TestCase):
       "value": 10
     }
 
-    data_1 = event_1.copy()
-    data_1["value_type"] = "float"
-    data_2 = event_2.copy()
-    data_2["value_type"] = "int"
-
-    post_r = requests.post(self.address, data=data_1)
+    post_r = requests.post(self.address, data=event_1)
     self.assertEqual(post_r.status_code, 200)
-    post_r = requests.post(self.address, data=data_2)
+    post_r = requests.post(self.address, data=event_2)
     self.assertEqual(post_r.status_code, 200)
 
     get_r = requests.get(self.address)
@@ -100,10 +92,7 @@ class TestServer(unittest.TestCase):
       "value": 0.001
     }
 
-    data = event.copy()
-    data["value_type"] = "float"
-
-    post_r = requests.post(self.address, data=data)
+    post_r = requests.post(self.address, data=event)
     self.assertEqual(post_r.status_code, 200)
 
     delete_r = requests.delete(self.address, data={
@@ -125,10 +114,7 @@ class TestServer(unittest.TestCase):
       "value": 0.001
     }
 
-    data = event.copy()
-    data["value_type"] = "float"
-
-    post_r = requests.post(self.address, data=data)
+    post_r = requests.post(self.address, data=event)
     self.assertEqual(post_r.status_code, 200)
 
     self.httpd.check_events(5)
@@ -155,10 +141,7 @@ class TestServer(unittest.TestCase):
       "value": 0.001
     }
 
-    data = event.copy()
-    data["value_type"] = "float"
-
-    post_r = requests.post(self.address, data=data)
+    post_r = requests.post(self.address, data=event)
     self.assertEqual(post_r.status_code, 400)
 
   @staticmethod

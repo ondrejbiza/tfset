@@ -1,5 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import multiprocessing, urllib, json, threading
+import tensorflow as tf
 
 class SessionServer(HTTPServer):
 
@@ -14,6 +15,17 @@ class SessionServer(HTTPServer):
     self.shared = manager.dict()
 
     self.shared["tensor_names"] = [tensor.name for tensor in tensors]
+
+    tensor_dtypes = []
+    for  tensor in tensors:
+      if tensor.dtype == tf.string or tensor.dtype.name == "string_ref":
+        tensor_dtypes.append(str)
+      else:
+        np_dtype = tensor.dtype.as_numpy_dtype
+        tensor_dtypes.append(type(np_dtype(0).item()))
+
+    self.shared["tensor_dtypes"] = tensor_dtypes
+
     self.shared["last_check_iteration"] = 0
 
     self.events = manager.list()
@@ -66,34 +78,21 @@ class SessionServer(HTTPServer):
       value = None
 
       if "iteration" in post_data and "tensor_name" in post_data and "value" in post_data:
-
         try:
           iteration = int(post_data["iteration"][0])
+
+          tensor_name = post_data["tensor_name"][0]
+
+          if tensor_name in self.server.shared["tensor_names"]:
+            tensor_index = self.server.shared["tensor_names"].index(tensor_name)
+            tensor_dtype = self.server.shared["tensor_dtypes"][tensor_index]
+
+            value = post_data["value"][0]
+            value = tensor_dtype(value)
+          else:
+            error = True
         except ValueError:
           error = True
-
-        tensor_name = post_data["tensor_name"][0]
-
-        if tensor_name not in self.server.shared["tensor_names"]:
-          error = True
-
-        value = post_data["value"][0]
-
-        if "value_type" in post_data:
-          value_type = post_data["value_type"][0]
-
-          try:
-            if value_type == "int":
-              value = int(value)
-            elif value_type == "float":
-              value = float(value)
-            elif value_type == "string":
-              pass
-            else:
-              error = True
-          except ValueError:
-            error = True
-
       else:
         error = True
 
