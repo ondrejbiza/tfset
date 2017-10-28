@@ -192,9 +192,8 @@ class TestServer(unittest.TestCase):
     self.assertEqual(len(self.httpd.events), 0)
     self.assertEqual(len(self.httpd.past_events), 2)
 
-    # TODO: FIX
-    self.assertIn(self.session.run(self.tensors[0]), [event_1["value"], event_2["value"]])
-
+    val = self.session.run(self.tensors[0])
+    self.assertTrue(abs(val - event_1["value"]) < 0.00001 or abs(val - event_2["value"]) < 0.00001)
     self.assertEqual(self.httpd.shared["last_check_iteration"], 10)
 
   def test_empty_post(self):
