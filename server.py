@@ -37,33 +37,17 @@ class SessionServer(HTTPServer):
     self.shared["last_check_iteration"] = iteration
 
     # check if any event is triggered
-<<<<<<< HEAD
     events_to_delete = []
-=======
-    idx_to_delete = []
-
-    for idx, event in enumerate(self.events):
->>>>>>> c2c755ada778f6dc38abb478d183a6f02bbbc723
 
     for event in sorted(self.events, key=lambda x: x["iteration"], reverse=True):
       if event["iteration"] <= iteration:
         self.assign_value(event["tensor_name"], event["value"])
-<<<<<<< HEAD
         events_to_delete.append(self.events.index(event))
 
     for event_idx in sorted(events_to_delete, reverse=True):
       self.past_events.append(self.events[event_idx])
       del self.events[event_idx]
 
-=======
-        self.past_events.append(self.events[idx])
-
-        idx_to_delete.append(idx)
-
-    # delete triggered events
-    for idx in idx_to_delete:
-      del self.events[idx]
->>>>>>> c2c755ada778f6dc38abb478d183a6f02bbbc723
 
   def assign_value(self, tensor_name, value):
 
