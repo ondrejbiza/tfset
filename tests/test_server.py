@@ -128,6 +128,75 @@ class TestServer(unittest.TestCase):
     self.assertAlmostEqual(self.session.run(self.tensors[0]), event["value"], places=3)
     self.assertEqual(self.httpd.shared["last_check_iteration"], 15)
 
+  def test_trigger_events(self):
+
+    event_1 = {
+      "iteration": 10,
+      "tensor_name": self.tensor_names[0],
+      "value": 0.001
+    }
+
+    event_2 = {
+      "iteration": 20,
+      "tensor_name": self.tensor_names[0],
+      "value": 0.0001
+    }
+
+    post_r = requests.post(self.address, data=event_1)
+    self.assertEqual(post_r.status_code, 200)
+    post_r = requests.post(self.address, data=event_2)
+    self.assertEqual(post_r.status_code, 200)
+
+    self.httpd.check_events(5)
+    self.assertEqual(len(self.httpd.events), 2)
+    self.assertEqual(len(self.httpd.past_events), 0)
+    self.assertEqual(self.httpd.shared["last_check_iteration"], 5)
+
+    self.httpd.check_events(15)
+    self.assertEqual(len(self.httpd.events), 1)
+    self.assertEqual(len(self.httpd.past_events), 1)
+    self.assertAlmostEqual(self.session.run(self.tensors[0]), event_1["value"], places=3)
+    self.assertEqual(self.httpd.shared["last_check_iteration"], 15)
+
+    self.httpd.check_events(20)
+    self.assertEqual(len(self.httpd.events), 0)
+    self.assertEqual(len(self.httpd.past_events), 2)
+    self.assertAlmostEqual(self.session.run(self.tensors[0]), event_2["value"], places=3)
+    self.assertEqual(self.httpd.shared["last_check_iteration"], 20)
+
+  def test_trigger_events_same_iter(self):
+
+    event_1 = {
+      "iteration": 10,
+      "tensor_name": self.tensor_names[0],
+      "value": 0.001
+    }
+
+    event_2 = {
+      "iteration": 10,
+      "tensor_name": self.tensor_names[0],
+      "value": 0.0001
+    }
+
+    post_r = requests.post(self.address, data=event_1)
+    self.assertEqual(post_r.status_code, 200)
+    post_r = requests.post(self.address, data=event_2)
+    self.assertEqual(post_r.status_code, 200)
+
+    self.httpd.check_events(5)
+    self.assertEqual(len(self.httpd.events), 2)
+    self.assertEqual(len(self.httpd.past_events), 0)
+    self.assertEqual(self.httpd.shared["last_check_iteration"], 5)
+
+    self.httpd.check_events(10)
+    self.assertEqual(len(self.httpd.events), 0)
+    self.assertEqual(len(self.httpd.past_events), 2)
+
+    # TODO: FIX
+    self.assertIn(self.session.run(self.tensors[0]), [event_1["value"], event_2["value"]])
+
+    self.assertEqual(self.httpd.shared["last_check_iteration"], 10)
+
   def test_empty_post(self):
 
     post_r = requests.post(self.address)
