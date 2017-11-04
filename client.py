@@ -52,16 +52,15 @@ def main(args):
 
   elif args.add:
 
-    if None in [args.tname, args.iter, args.value, args.vtype]:
+    if None in [args.name, args.iter, args.value]:
 
-      print("Please specify tensor name (--tname), iteration (--iter), value (--value) and value typep (--vtype).")
+      print("Please specify tensor name (--name), iteration (--iter) and value (--value).")
       exit(1)
 
     data = {
-      "tensor_name": args.tname,
+      "tensor_name": args.name,
       "iteration": args.iter,
       "value": args.value,
-      "value_type": args.vtype
     }
 
     post_r = requests.post(address, data=data)
@@ -104,13 +103,12 @@ parser.add_argument("-a", "--add", default=False, action="store_true", help="add
 parser.add_argument("-r", "--remove", default=False, action="store_true", help="remove event")
 
 # add parameters
-parser.add_argument("--tname", help="tensor name")
-parser.add_argument("--iter", type=int, help="iteration")
-parser.add_argument("--value", help="value")
-parser.add_argument("--vtype", help="value type")
+parser.add_argument("-n", "--name", help="tensor name")
+parser.add_argument("-i", "--iter", type=int, help="iteration")
+parser.add_argument("-v", "--value", help="value")
 
 # remove parameters
-parser.add_argument("--eidx", type=int, help="event index")
+parser.add_argument("-e", "--eidx", type=int, help="event index")
 
 # connection parameters
 parser.add_argument("--address", default="http://127.0.0.1")
