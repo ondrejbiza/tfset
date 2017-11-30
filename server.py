@@ -5,6 +5,14 @@ import tensorflow as tf
 class SessionServer(HTTPServer):
 
   def __init__(self, tensors, session, address="127.0.0.1", port=8084):
+    """
+    Session Server allows Tensor values to be changed while training.
+    :param tensors:     List of Tensors that can be interactively changed.
+    :param session:     Tensorflow session to use.
+    :param address:     Server address.
+    :param port:        Server port.
+    :return:            None.
+    """
 
     super(HTTPServer, self).__init__((address, port), self.RequestHandler)
 
@@ -32,6 +40,11 @@ class SessionServer(HTTPServer):
     self.past_events = manager.list()
 
   def check_events(self, iteration):
+    """
+    Check if some event should be triggered.
+    :param iteration:     Current training iteration (global step).
+    :return:              None.
+    """
 
     # remember when we last checked
     self.shared["last_check_iteration"] = iteration
@@ -50,6 +63,11 @@ class SessionServer(HTTPServer):
 
 
   def assign_value(self, tensor_name, value):
+    """
+    Assign new value to a Tensor.
+    :param tensor_name:       Name of the Tensor to changed.
+    :param value:             New value for the Tensor.
+    """
 
     tensor_index = self.shared["tensor_names"].index(tensor_name)
     tensor = self.tensors[tensor_index]
@@ -58,6 +76,9 @@ class SessionServer(HTTPServer):
   class RequestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
+      """
+      Handle a GET request - should return the list of events and other info.
+      """
 
       # events and past_events are a ListProxy that isn't JSON serializable => convert it to Python list
       json_obj = {
@@ -74,6 +95,10 @@ class SessionServer(HTTPServer):
       self.wfile.write(json_string)
 
     def do_POST(self):
+      """
+      Handle a POST request - add new event.
+      """
+
       length = int(self.headers['Content-Length'])
       post_data = urllib.parse.parse_qs(self.rfile.read(length).decode('utf-8'))
 
@@ -110,6 +135,10 @@ class SessionServer(HTTPServer):
       self.end_headers()
 
     def do_DELETE(self):
+      """
+      Handle a DELETE request - remove an event.
+      """
+
       length = int(self.headers['Content-Length'])
       post_data = urllib.parse.parse_qs(self.rfile.read(length).decode('utf-8'))
 
@@ -133,6 +162,14 @@ class SessionServer(HTTPServer):
       self.end_headers()
 
     def add_event(self, iteration, tensor_name, value):
+      """
+      Register an event.
+      :param iteration:       When to trigger the event.
+      :param tensor_name:     Which Tensor to change.
+      :param value:           Value for the Tensor.
+      :return:                None.
+      """
+
       self.server.events.append({
         "iteration": iteration, "tensor_name": tensor_name, "value": value
       })
@@ -141,6 +178,15 @@ class SessionServer(HTTPServer):
       return
 
 def run_server(tensors, session, address="127.0.0.1", port=8084):
+  """
+  Run a SessionServer.
+  :param tensors:         Tensors to register.
+  :param session:         Current Tensorflow session.
+  :param address:         Server address.
+  :param port:            Server port.
+  :return:                Tuple - server object and a its thread.
+  """
+
   httpd = SessionServer(tensors, session, address=address, port=port)
 
   def worker(server):

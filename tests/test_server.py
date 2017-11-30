@@ -15,7 +15,6 @@ class TestServer(unittest.TestCase):
     self.invalid_tensor_name = "t1"
     self.session = tf.Session()
     self.session.run(tf.global_variables_initializer())
-
     self.httpd, self.thread = server.run_server(self.tensors, self.session)
 
   def tearDown(self):
@@ -38,26 +37,11 @@ class TestServer(unittest.TestCase):
     self.assertEqual(set(content["tensor_names"]), set(self.tensor_names))
     self.assertEqual(content["last_check_iteration"], 0)
 
-  def test_add_event(self):
-
-    event = {
-      "iteration": 10,
-      "tensor_name": self.tensor_names[0],
-      "value": 0.001
-    }
-
-    post_r = requests.post(self.address, data=event)
-    self.assertEqual(post_r.status_code, 200)
-
-    get_r = requests.get(self.address)
-    content = self.__decode_json(get_r.content)
-
-    self.assertEqual(get_r.status_code, 200)
-    self.assertTrue(len(content["events"]) == 1)
-    self.assertDictEqual(content["events"][0], event)
-    self.assertTrue(len(content["past_events"]) == 0)
-
   def test_add_events(self):
+
+    events = [
+
+    ]
 
     event_1 = {
       "iteration": 10,
