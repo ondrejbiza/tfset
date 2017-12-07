@@ -191,7 +191,7 @@ class SessionServer(HTTPServer):
     def log_message(self, format, *args):
       return
 
-def run_server(tensors, session, address="127.0.0.1", port=8084):
+def run_server(tensors, session, address="127.0.0.1", port=8084, assign_ops=None, placeholders=None):
   """
   Run a SessionServer.
   :param tensors:         Tensors to register.
@@ -201,7 +201,7 @@ def run_server(tensors, session, address="127.0.0.1", port=8084):
   :return:                Tuple - server object and a its thread.
   """
 
-  httpd = SessionServer(tensors, session, address=address, port=port)
+  httpd = SessionServer(tensors, session, address=address, port=port, assign_ops=assign_ops, placeholders=placeholders)
 
   def worker(server):
     server.serve_forever()
