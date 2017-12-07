@@ -1,7 +1,9 @@
 # Interactive Tensorflow #
 
-Interactive Tensorflow allows you to alter hyper-parameters during training. It contains a server that 
-handles updating the parameters and a client that communicates with the server.
+![Validation Curve](images/validation_curve.png)
+
+Change the hyper-parameters of your Tensorflow training session on the fly.
+The package allows you to schedule events that change the values of arbitrary Tensors with a simple command.
 
 ### Requirements ###
 
@@ -20,7 +22,7 @@ or
 
 if you want to clone to an existing git repository.
 
-We change the name of the repository to interactive_tensorflow because Python does not like the 
+We change the name of the repository to interactive_tensorflow because Python does not like the
 dash symbol when importing modules.
 
 ### Usage ###
@@ -37,15 +39,22 @@ dropout_prob = tf.get_variable("dropout_prob", initializer=tf.constant(0.9, dtyp
 Create and start a Session Server.
 
 ```
-# 'session' is a Tensorflow session
+# "session" is a Tensorflow session
 s, thread = server.run_server([learning_rate, dropout_prob], session)
 ```
 
 Periodically check for events.
 
 ```
-# 'step' is the global step of your training procedure
+# "step" is the global step of your training procedure
 s.check_events(step)
+```
+
+Stop the server.
+
+```
+s.shutdown()
+thread.join(timeout=10)
 ```
 
 #### Client ####
@@ -54,10 +63,10 @@ Get status.
 
 `python client.py -s`
 
-Add an event.
+Add an event (this event sets the learning rate to 0.01 at iteration 10000).
 
-`python client.py -a --tname learning_rate:0 --iter 10000 --value 0.01 --vtype float`
+`python client.py -a -n learning_rate:0 -i 10000 --value 0.01`
 
-Remove an event.
+Remove an event (with index 0 in this case).
 
-`python clien.py -r --eidx 0`
+`python clien.py -r -e 0`

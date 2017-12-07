@@ -1,9 +1,19 @@
 import argparse, json, requests
 
 def decode_json(content):
+  """
+  Decode a JSON string.
+  :param content:     JSON string.
+  :return:            JSON object.
+  """
   return json.loads(content.decode())
 
 def print_events(events):
+  """
+  Print interactive-tensorflow events.
+  :param events:    List of events.
+  :return:          None.
+  """
 
   if len(events) > 0:
     for event in events:
@@ -16,6 +26,7 @@ def main(args):
   address = "{}:{}".format(args.address, args.port)
 
   if args.status:
+    # get status of the server
 
     r = requests.get(address)
     content = decode_json(r.content)
@@ -51,6 +62,7 @@ def main(args):
     print("Last iteration checked: {:d}".format(content["last_check_iteration"]))
 
   elif args.add:
+    # add an event
 
     if None in [args.name, args.iter, args.value]:
 
@@ -72,6 +84,7 @@ def main(args):
       exit(1)
 
   elif args.remove:
+    # remove an event
 
     if None in [args.eidx]:
 
@@ -95,7 +108,7 @@ def main(args):
     print("No action specified.")
     exit(1)
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser("Client for interactive-tensorflow server.")
 
 # action parameters
 parser.add_argument("-s", "--status", default=False, action="store_true", help="print status (tensor names, registered events, ...)")
@@ -103,16 +116,16 @@ parser.add_argument("-a", "--add", default=False, action="store_true", help="add
 parser.add_argument("-r", "--remove", default=False, action="store_true", help="remove event")
 
 # add parameters
-parser.add_argument("-n", "--name", help="tensor name")
-parser.add_argument("-i", "--iter", type=int, help="iteration")
-parser.add_argument("-v", "--value", help="value")
+parser.add_argument("-n", "--name", help="new event - tensor name")
+parser.add_argument("-i", "--iter", type=int, help="new event - iteration")
+parser.add_argument("-v", "--value", help="new event - value")
 
 # remove parameters
-parser.add_argument("-e", "--eidx", type=int, help="event index")
+parser.add_argument("-e", "--eidx", type=int, help="index of an event that should be removed")
 
 # connection parameters
-parser.add_argument("--address", default="http://127.0.0.1")
-parser.add_argument("--port", type=int, default=8084)
+parser.add_argument("--address", default="http://127.0.0.1", help="address of the server")
+parser.add_argument("--port", type=int, default=8084, help="port of the server")
 
 parsed = parser.parse_args()
 
