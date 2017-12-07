@@ -9,6 +9,9 @@ class SessionServer(HTTPServer):
     super(HTTPServer, self).__init__((address, port), self.RequestHandler)
 
     self.tensors = tensors
+    self.tensor_placeholders = [tf.placeholder(tensor.dtype, shape=tensor.shape) for tensor in tensors]
+    self.tensor_assign_ops = [tf.assign(tensor, placeholder) for tensor, placeholder in zip(self.tensors, self.tensor_placeholders)]
+
     self.session = session
 
     manager = multiprocessing.Manager()
