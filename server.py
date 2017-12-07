@@ -4,21 +4,26 @@ import tensorflow as tf
 
 class SessionServer(HTTPServer):
 
-  def __init__(self, tensors, session, address="127.0.0.1", port=8084):
+  def __init__(self, tensors, session, address="127.0.0.1", port=8084, assign_ops=None, placeholders=None):
     """
     Session Server allows Tensor values to be changed while training.
-    :param tensors:     List of Tensors that can be interactively changed.
-    :param session:     Tensorflow session to use.
-    :param address:     Server address.
-    :param port:        Server port.
-    :return:            None.
+    :param tensors:         List of Tensors that can be interactively changed.
+    :param session:         Tensorflow session to use.
+    :param address:         Server address.
+    :param port:            Server port.
+    :param assign_ops       Ops that assign values to Tensors. Used in distributed training.
+    :param placeholders     Placeholders for assign ops. Used in distributed training.
+    :return:                None.
     """
 
     super(HTTPServer, self).__init__((address, port), self.RequestHandler)
 
     self.tensors = tensors
-    self.tensor_placeholders = [tf.placeholder(tensor.dtype, shape=tensor.shape) for tensor in tensors]
-    self.tensor_assign_ops = [tf.assign(tensor, placeholder) for tensor, placeholder in zip(self.tensors, self.tensor_placeholders)]
+    self.assign_ops = assign_ops
+    self.placeholders = placeholders
+
+    if not (assign_ops is None and placeholders is None) or (assign_ops is not None and placeholders is not None):
+      raise ValueError("Either specify both assign_ops and placeholders or none.")
 
     self.session = session
 
@@ -74,7 +79,13 @@ class SessionServer(HTTPServer):
 
     tensor_index = self.shared["tensor_names"].index(tensor_name)
     tensor = self.tensors[tensor_index]
-    self.session.run(tensor.assign(value))
+
+    if self.assign_ops is None:
+      self.session.run(tensor.assign(value))
+    else:
+      self.session.run(self.assign_ops[tensor_index], feed_dict={
+        self.placeholders[tensor_index]: value
+      })
 
   class RequestHandler(BaseHTTPRequestHandler):
 
