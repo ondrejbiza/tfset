@@ -22,7 +22,7 @@ class SessionServer(HTTPServer):
     self.assign_ops = assign_ops
     self.placeholders = placeholders
 
-    if not (assign_ops is None and placeholders is None) or (assign_ops is not None and placeholders is not None):
+    if not ((assign_ops is None and placeholders is None) or (assign_ops is not None and placeholders is not None)):
       raise ValueError("Either specify both assign_ops and placeholders or none.")
 
     self.session = session
