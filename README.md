@@ -27,7 +27,18 @@ dash symbol when importing modules.
 
 ### Usage ###
 
+#### Interactive Tensorflow DEMO ####
+
+Check [MNIST_demo.ipynb] for a demostration and reference integration of Interactive Tensorflow
+into Tensorflow training.
+
 #### Server ####
+
+Import Interactive Tensorflow server.
+
+```
+import path.to.interactive_tensorflow.server as server
+```
 
 Create Tensors for your hyper-parameters.
 
@@ -80,7 +91,7 @@ An event contains the following information:
 * **Tensor name**: which Tensor to change
 * **value**: value to set the Tensor to
 
-The reason for the use of events is that you might want to schedule hyper-parameter change
+The reason for the use of events is that you might want to schedule hyper-parameter changes
 in the future (e.g. lower learning rate to 10e-3 at 800k iteration). If two events
 targeting the same Tensor are scheduled at the same iteration, the one that was
-scheduled later is going to be executed last.
+scheduled later is going to be executed.
