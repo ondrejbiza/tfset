@@ -75,6 +75,7 @@ class SessionServer(HTTPServer):
     Assign new value to a Tensor.
     :param tensor_name:       Name of the Tensor to changed.
     :param value:             New value for the Tensor.
+    :return:                  None.
     """
 
     tensor_index = self.shared["tensor_names"].index(tensor_name)

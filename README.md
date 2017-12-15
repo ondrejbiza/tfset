@@ -2,7 +2,7 @@
 
 ![Validation Curve](images/validation_curve.png)
 
-Change the hyper-parameters of your Tensorflow training session on the fly.
+**Change the hyper-parameters** of your Tensorflow training session on the fly.
 The package allows you to schedule events that change the values of arbitrary Tensors with a simple command.
 
 ### Requirements ###
