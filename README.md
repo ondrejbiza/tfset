@@ -70,3 +70,17 @@ Add an event (this event sets the learning rate to 0.01 at iteration 10000).
 Remove an event (with index 0 in this case).
 
 `python clien.py -r -e 0`
+
+#### Events ####
+
+Interactive Tensorflow schedules hyper-parameter changes based on **events**.
+An event contains the following information:
+
+* **iteration**: when to execute the event
+* **Tensor name**: which Tensor to change
+* **value**: value to set the Tensor to
+
+The reason for the use of events is that you might want to schedule hyper-parameter change
+in the future (e.g. lower learning rate to 10e-3 at 800k iteration). If two events
+targeting the same Tensor are scheduled at the same iteration, the one that was
+scheduled later is going to be executed last.
