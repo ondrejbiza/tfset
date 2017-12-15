@@ -29,8 +29,8 @@ dash symbol when importing modules.
 
 #### Interactive Tensorflow DEMO ####
 
-Check [MNIST_demo.ipynb] for a demostration and reference integration of Interactive Tensorflow
-into Tensorflow training.
+Check [MNIST_demo.ipynb](https://github.com/ondrejba/interactive-tensorflow/blob/master/MNIST_demo.ipynb)
+for a demostration of the usage of Interactive Tensorflow in a simple training script.
 
 #### Server ####
 
