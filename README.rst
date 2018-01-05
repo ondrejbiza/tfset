@@ -1,7 +1,7 @@
 tfset
 =====
 
-.. figure:: images/validation_curve.png
+.. figure:: tfset/images/validation_curve.png
    :alt: Validation Curve
 
    Validation Curve
