@@ -130,8 +130,9 @@ parser.add_argument("--port", type=int, default=8084, help="port of the server")
 parsed = parser.parse_args()
 
 # catch all request connection errors
-try:
-  main(parsed)
-except requests.exceptions.ConnectionError:
-  print("Connection error.")
-  exit(1)
+if __name__ == "__main__":
+  try:
+    main(parsed)
+  except requests.exceptions.ConnectionError:
+    print("Connection error.")
+    exit(1)

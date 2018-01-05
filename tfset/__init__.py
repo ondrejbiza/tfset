@@ -1,2 +1,1 @@
-import server
-import client
+from . import server

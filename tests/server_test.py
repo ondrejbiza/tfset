@@ -1,5 +1,7 @@
-import unittest, server, requests, json
+import unittest, requests, json
 import tensorflow as tf
+
+import tfset
 
 class TestServer(unittest.TestCase):
 
@@ -15,7 +17,7 @@ class TestServer(unittest.TestCase):
     self.invalid_tensor_name = "t1"
     self.session = tf.Session()
     self.session.run(tf.global_variables_initializer())
-    self.httpd, self.thread = server.run_server(self.tensors, self.session)
+    self.httpd, self.thread = tfset.server.run_server(self.tensors, self.session)
 
   def tearDown(self):
     self.httpd.shutdown()
