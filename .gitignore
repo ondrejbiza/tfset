@@ -1,17 +1,10 @@
-.idea
-__pycache__
 /.ipynb_checkpoints
 /build
-
-# Compiled python modules.
-*.pyc
-
-# Setuptools distribution folder.
 /dist/
+/tfset/demo/
 
-# Python egg metadata, regenerated from source files by setuptools.
+*.pyc
 /*.egg-info
 /*.egg
-
-# demo data
-/tfset/demo/
+.idea
+__pycache__
