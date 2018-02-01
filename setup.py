@@ -23,6 +23,7 @@ setup(
   author_email="ondrej.biza@gmail.com",
   license="MIT",
   packages=["tfset"],
+  scripts=["tfset/bin/tfset-client"],
   install_requires=[
     "tensorflow"
   ],
