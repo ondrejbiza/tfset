@@ -6,7 +6,7 @@ def readme():
 
 setup(
   name="tfset",
-  version="1.1",
+  version="1.2",
   description="Set Tensor values during training in Tensorflow.",
   long_description=readme(),
   classifiers=[
@@ -25,7 +25,7 @@ setup(
   packages=["tfset"],
   scripts=["tfset/bin/tfset"],
   install_requires=[
-    "tensorflow"
+    "tensorflow>=1.0"
   ],
   include_package_data=True,
   zip_safe=False,
