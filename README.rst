@@ -4,8 +4,6 @@ tfset
 .. figure:: tfset/images/validation_curve.png
    :alt: Validation Curve
 
-   Validation Curve
-
 **Change the hyper-parameters** of your Tensorflow training session on
 the fly. The package allows you to schedule events that change the
 values of arbitrary Tensors with a simple command.
@@ -19,18 +17,17 @@ Requirements
 Set Up
 ~~~~~~
 
-Clone the repository with either
+Install the package with pip
 
-``git clone https://github.com/ondrejba/interactive-tensorflow.git interactive_tensorflow``
+``pip install tfset``
 
-or
+Or clone and install the repository
 
-``git submodule add https://github.com/ondrejba/interactive-tensorflow.git interactive_tensorflow``
+.. code-block:: python
 
-if you want to clone to an existing git repository.
-
-We change the name of the repository to interactive\_tensorflow because
-Python does not like the dash symbol when importing modules.
+   git clone https://github.com/ondrejba/tfset.git
+   cd tfset
+   python setup.py install
 
 Usage
 ~~~~~
@@ -39,7 +36,7 @@ Interactive Tensorflow DEMO
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Check
-`MNIST\_demo.ipynb <https://github.com/ondrejba/interactive-tensorflow/blob/master/MNIST_demo.ipynb>`__
+`MNIST\_demo.ipynb <https://github.com/ondrejba/tfset/blob/master/MNIST_demo.ipynb>`__
 for a demostration of the usage of Interactive Tensorflow in a simple
 training script.
 
