@@ -36,7 +36,7 @@ tfset DEMO
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Check
-`MNIST\_demo.ipynb <https://github.com/ondrejba/tfset/blob/master/MNIST_demo.ipynb>`__
+`MNIST\_demo.ipynb <https://github.com/ondrejba/tfset/blob/master/tfset/MNIST_demo.ipynb>`__
 for a demostration of the usage of tfset in a simple
 training script.
 
