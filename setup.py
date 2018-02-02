@@ -6,7 +6,7 @@ def readme():
 
 setup(
   name="tfset",
-  version="1.0",
+  version="1.1",
   description="Set Tensor values during training in Tensorflow.",
   long_description=readme(),
   classifiers=[
