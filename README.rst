@@ -17,13 +17,13 @@ Requirements
 Set Up
 ~~~~~~
 
-Install the package with pip
+Install the package with pip:
 
 ``pip install tfset``
 
-Or clone and install the repository
+Or clone and install from github:
 
-.. code-block:: python
+.. code-block:: bash
 
    git clone https://github.com/ondrejba/tfset.git
    cd tfset
@@ -32,22 +32,22 @@ Or clone and install the repository
 Usage
 ~~~~~
 
-Interactive Tensorflow DEMO
+tfset DEMO
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Check
 `MNIST\_demo.ipynb <https://github.com/ondrejba/tfset/blob/master/MNIST_demo.ipynb>`__
-for a demostration of the usage of Interactive Tensorflow in a simple
+for a demostration of the usage of tfset in a simple
 training script.
 
 Server
 ^^^^^^
 
-Import Interactive Tensorflow server.
+Import tfset server.
 
 ::
 
-    import path.to.interactive_tensorflow.server as server
+    import tfset.server as server
 
 Create Tensors for your hyper-parameters.
 
@@ -82,21 +82,21 @@ Client
 
 Get status.
 
-``python client.py -s``
+``tfset -s``
 
 Add an event (this event sets the learning rate to 0.01 at iteration
 10000).
 
-``python client.py -a -n learning_rate:0 -i 10000 --value 0.01``
+``tfset -a -n learning_rate:0 -i 10000 --value 0.01``
 
 Remove an event (with index 0 in this case).
 
-``python clien.py -r -e 0``
+``tfset -r -e 0``
 
 Events
 ^^^^^^
 
-Interactive Tensorflow schedules hyper-parameter changes based on
+tfset schedules hyper-parameter changes based on
 **events**. An event contains the following information:
 
 -  **iteration**: when to execute the event
